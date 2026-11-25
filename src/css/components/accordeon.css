@@ -2,26 +2,30 @@
 * Accordeon
 */
 
-/* Conteneur : les détails sont côte à côte */
+/* Conteneur : les détails sont empilés verticalement */
 .accordeon {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
+  gap: 5px;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
 }
 
-/* details fermé et ouvert */
+/* details fermé et ouvert : une carte grise aux coins arrondis */
 .accordeon > details {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.75rem;
-  flex-shrink: 0;
-  width: 150px; /* image (102px) + espace avec le suivant */
-  overflow: hidden; /* le texte ne déborde pas pendant l'animation */
-  transition: width 0.5s ease-in-out; /* les voisins glissent en douceur */
+  width: 180px;
+  padding: 4px;
+  border-radius: 5px;
+  background-color: #ebebeb;
+  interpolate-size: allow-keywords; /* permet d'animer jusqu'à height: auto */
 }
 
+/* summary : l'image, puis le triangle à droite */
 .accordeon > details > summary {
-  flex-shrink: 0;
-  list-style: none; /* pas de triangle */
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  list-style: none; /* supprime le triangle d'origine */
   cursor: pointer;
 }
 
@@ -34,36 +38,52 @@
   display: block;
 }
 
-/* Texte : largeur fixe pour qu'il ne se réorganise pas pendant l'animation */
+/* Triangle CSS : une boîte vide dont seule la bordure gauche est colorée */
+.accordeon > details > summary::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-top: 30px solid transparent;
+  border-bottom: 30px solid transparent;
+  border-left: 30px solid #bbb; /* fermé : gris, pointe vers la droite */
+  transition: transform 0.5s, border-left-color 0.5s;
+}
+
+/* ouvert : le triangle tourne vers le bas et devient rose */
+.accordeon > details[open] > summary::after {
+  transform: rotate(90deg);
+  border-left-color: #ffb3b3;
+}
+
+/* Contenu sous l'image */
 .accordeon > details > div {
-  flex-shrink: 0;
-  width: 120px;
-  opacity: 0;
-  transform: translateX(-1rem);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  padding: 0 30px 0 8px;
 }
 
-/* details ouvert : il s'élargit pour afficher le texte à droite de l'image */
-.accordeon > details[open] {
-  width: 300px;
+.accordeon > details > div h3 {
+  margin: 0.5rem 0 0.9rem;
+  font-size: 15px;
 }
 
-.accordeon > details[open] > div {
-  opacity: 1;
-  transform: translateX(0);
-  transition-delay: 0.15s; /* le texte apparaît une fois la place faite */
+.accordeon > details > div p {
+  margin: 0 0 0.3rem;
+  font-size: 13px;
 }
 
-/* Navigateurs récents : garde le contenu visible pendant la fermeture
-   pour que le texte s'efface en fondu au lieu de disparaître d'un coup */
+/* Ouverture / fermeture animée en hauteur (navigateurs récents) */
 .accordeon > details::details-content {
-  transition: content-visibility 0.5s allow-discrete;
+  height: 0;
+  overflow: clip;
+  transition: height 0.5s, content-visibility 0.5s allow-discrete;
+}
+
+.accordeon > details[open]::details-content {
+  height: auto;
 }
 
 /* Si l'utilisateur préfère moins d'animations */
 @media (prefers-reduced-motion: reduce) {
-  .accordeon > details,
-  .accordeon > details > div,
+  .accordeon > details > summary::after,
   .accordeon > details::details-content {
     transition: none;
   }
