@@ -1,3 +1,70 @@
 /**
 * Accordeon
 */
+
+/* Conteneur : les détails sont côte à côte */
+.accordeon {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* details fermé et ouvert */
+.accordeon > details {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+  flex-shrink: 0;
+  width: 150px; /* image (102px) + espace avec le suivant */
+  overflow: hidden; /* le texte ne déborde pas pendant l'animation */
+  transition: width 0.5s ease-in-out; /* les voisins glissent en douceur */
+}
+
+.accordeon > details > summary {
+  flex-shrink: 0;
+  list-style: none; /* pas de triangle */
+  cursor: pointer;
+}
+
+.accordeon > details > summary::marker,
+.accordeon > details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordeon > details > summary img {
+  display: block;
+}
+
+/* Texte : largeur fixe pour qu'il ne se réorganise pas pendant l'animation */
+.accordeon > details > div {
+  flex-shrink: 0;
+  width: 120px;
+  opacity: 0;
+  transform: translateX(-1rem);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* details ouvert : il s'élargit pour afficher le texte à droite de l'image */
+.accordeon > details[open] {
+  width: 300px;
+}
+
+.accordeon > details[open] > div {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.15s; /* le texte apparaît une fois la place faite */
+}
+
+/* Navigateurs récents : garde le contenu visible pendant la fermeture
+   pour que le texte s'efface en fondu au lieu de disparaître d'un coup */
+.accordeon > details::details-content {
+  transition: content-visibility 0.5s allow-discrete;
+}
+
+/* Si l'utilisateur préfère moins d'animations */
+@media (prefers-reduced-motion: reduce) {
+  .accordeon > details,
+  .accordeon > details > div,
+  .accordeon > details::details-content {
+    transition: none;
+  }
+}
